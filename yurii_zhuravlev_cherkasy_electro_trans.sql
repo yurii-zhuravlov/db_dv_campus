@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.29, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.26, for macos10.14 (x86_64)
 --
--- Host: 127.0.0.1    Database: yurii_zhuravlev_cherkasy_electro_trans
+-- Host: localhost    Database: yurii_zhuravlev_cherkasy_electro_trans
 -- ------------------------------------------------------
--- Server version	5.7.27
+-- Server version	5.7.26
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -94,7 +94,7 @@ CREATE TABLE `race` (
   CONSTRAINT `RACE_EMPLOYE_ID_EMPLOYE_ID` FOREIGN KEY (`employe_id`) REFERENCES `employe` (`id`) ON DELETE SET NULL,
   CONSTRAINT `RACE_ROUTE_ID_ROUTE_ID` FOREIGN KEY (`route_id`) REFERENCES `route` (`id`) ON DELETE SET NULL,
   CONSTRAINT `RACE_TRANSPORT_ID_TRANSPORT_ID` FOREIGN KEY (`transport_id`) REFERENCES `transport` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -103,6 +103,7 @@ CREATE TABLE `race` (
 
 LOCK TABLES `race` WRITE;
 /*!40000 ALTER TABLE `race` DISABLE KEYS */;
+INSERT INTO `race` VALUES (1,1,3,1,'2019-09-01',289,513),(2,7,7,7,'2019-09-01',374,649),(3,14,4,4,'2019-09-01',275,537),(4,15,5,7,'2019-09-01',315,583),(5,1,3,1,'2019-09-02',342,452),(6,7,7,7,'2019-09-02',414,565),(7,14,4,4,'2019-09-02',325,501),(8,15,5,7,'2019-09-02',367,502),(9,1,3,1,'2019-09-03',323,530),(10,7,7,7,'2019-09-03',377,672),(11,14,4,4,'2019-09-03',309,579),(12,15,5,7,'2019-09-03',301,542),(13,1,3,1,'2019-09-04',301,501),(14,7,7,7,'2019-09-04',332,602),(15,14,4,4,'2019-09-04',245,521),(16,15,5,7,'2019-09-04',263,456),(17,1,3,1,'2019-09-05',255,472),(18,7,7,7,'2019-09-05',310,531),(19,14,4,4,'2019-09-05',202,508),(20,15,5,7,'2019-09-05',213,403),(21,1,3,1,'2019-09-06',320,390),(22,7,7,7,'2019-09-06',346,462),(23,14,4,4,'2019-09-06',258,421),(24,15,5,7,'2019-09-06',290,370),(25,1,3,1,'2019-09-07',390,532),(26,7,7,7,'2019-09-07',474,680),(27,14,4,4,'2019-09-07',315,509),(28,15,5,7,'2019-09-07',337,409),(29,1,3,1,'2019-09-08',334,637),(30,7,7,7,'2019-09-08',404,632),(31,14,4,4,'2019-09-08',364,553),(32,15,5,7,'2019-09-08',334,490),(33,1,3,1,'2019-09-09',420,510),(34,7,7,7,'2019-09-09',456,734),(35,14,4,4,'2019-09-09',390,523),(36,15,5,7,'2019-09-09',384,590),(37,1,3,1,'2019-09-10',373,710),(38,7,7,7,'2019-09-10',362,584),(39,14,4,4,'2019-09-10',320,621),(40,15,5,7,'2019-09-10',410,494),(41,1,3,1,'2019-09-11',289,475),(42,7,7,7,'2019-09-11',271,467),(43,14,4,4,'2019-09-11',298,483),(44,15,5,7,'2019-09-11',310,421);
 /*!40000 ALTER TABLE `race` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -119,7 +120,7 @@ CREATE TABLE `route` (
   `number` varchar(255) NOT NULL,
   `price` decimal(20,4) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -128,6 +129,7 @@ CREATE TABLE `route` (
 
 LOCK TABLES `route` WRITE;
 /*!40000 ALTER TABLE `route` DISABLE KEYS */;
+INSERT INTO `route` VALUES (1,'ЧЛФЗ \"Аврора\" - санаторій \"Україна\"','1',3.0000),(2,'вул. Пацаєва - санаторій \"Україна\"','1A',3.0000),(3,'вул. Пацаєва - ЧШК','2',3.0000),(4,'санаторій \"Україна\" - Залізничний вокзал\n','3',3.0000),(5,'вул. Луначарського - Троллейбусний парк\n','4',3.0000),(6,'вул. Луначарського - Залізничний вокзал\n','4A',3.0000),(7,'вул. Можайського - Троллейбусний парк\n','7',3.0000),(8,'санаторій \"Україна\" - Тролейбусний парк\n','7A',3.0000),(9,'ЧЛФЗ \"Аврора\" - вул. Руставі\n','8',3.0000),(10,'ЧЛФЗ \"Аврора\" - Аеропорт\n','8P',3.0000),(11,'Річковий вокзал - вул. Конєва\n','10',3.0000),(12,'вул. Пацаєва - вул. Руставі\n','11',3.0000),(13,'вул. Онопрієнка - Аеропорт\n','14',3.0000),(14,'Вантажний порт - Аеропорт\n','50',3.0000);
 /*!40000 ALTER TABLE `route` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -193,4 +195,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-02-13  8:51:21
+-- Dump completed on 2020-02-13 10:57:02
