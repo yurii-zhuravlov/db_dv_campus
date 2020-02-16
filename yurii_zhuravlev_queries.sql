@@ -7,11 +7,11 @@ ORDER BY t_employe.lastname;
 SELECT t_employe.id,
        t_employe.firstname,
        t_employe.lastname,
-       AVG(t_salary.amount)
+       AVG(t_salary.amount) as average_salary
 FROM yurii_zhuravlev_cherkasy_electro_trans.salary AS t_salary
 JOIN yurii_zhuravlev_cherkasy_electro_trans.employe AS t_employe
     ON t_salary.employe_id = t_employe.id
-GROUP BY t_employe.id;
+GROUP BY t_salary.employe_id;
 
 # Query #3: get average and highest current salary by position (store current salary in the employees table)
 SELECT t_position.id,
@@ -22,8 +22,8 @@ FROM yurii_zhuravlev_cherkasy_electro_trans.position AS t_position
 JOIN yurii_zhuravlev_cherkasy_electro_trans.employe AS t_employe
     ON t_position.id = t_employe.position_id
 JOIN yurii_zhuravlev_cherkasy_electro_trans.salary AS t_salary
-    ON t_employe.id = t_salary.employe_id
-GROUP BY position_id;
+    ON t_position.id = t_salary.position_id
+GROUP BY t_position.id;
 
 # Query #4: get total number of days every person worked and total income
 SELECT t_employe.id,
@@ -44,13 +44,14 @@ SELECT t_transport.id,
        t_transport.number,
        SUM(t_race.tickets_sold * t_route.price) AS total_income,
        AVG(t_race.tickets_sold * t_route.price) AS average_income,
-       COUNT(*) as working_days
+       COUNT(t_transport.id) as working_days
 FROM yurii_zhuravlev_cherkasy_electro_trans.transport AS t_transport
 JOIN yurii_zhuravlev_cherkasy_electro_trans.race AS t_race
     ON t_transport.id = t_race.transport_id
 JOIN yurii_zhuravlev_cherkasy_electro_trans.route AS t_route
     ON t_race.route_id = t_route.id
-GROUP BY t_transport.id;
+GROUP BY t_transport.id
+ORDER BY working_days DESC;
 
 # Query #6: get people who have birthday in May
 SELECT t_employe.id,
