@@ -1,14 +1,19 @@
 <?php
 declare(strict_types=1);
-require_once 'vendor/autoload.php';
 
+require_once __DIR__ . '/vendor/autoload.php';
+
+/**
+ * Class Fixtures
+ * @SuppressWarnings(PHPMD.LongVariable)
+ */
 class Fixtures
 {
-    private CONST FAKER_LOCALE = 'uk_UA';
-    private CONST MIN_YEARS = 16;
-    private CONST MAX_YEARS = 45;
-    private CONST MIN_HIRED = 1;
-    private CONST MAX_HIRED = 10;
+    private const FAKER_LOCALE = 'uk_UA';
+    private const MIN_YEARS = 16;
+    private const MAX_YEARS = 45;
+    private const MIN_HIRED = 1;
+    private const MAX_HIRED = 10;
 
     /**
      * @var PDO $connection
@@ -70,27 +75,43 @@ class Fixtures
         return $this->getFaker()->lastName;
     }
 
-    private function getRandomProduct(): string
-    {
-        return uniqid('', false);
-    }
-
     private function cleanup(): void
     {
         $connection = $this->getConnection();
-        $connection->exec('DELETE FROM employee WHERE id > 17');
-        $connection->exec('ALTER TABLE employee AUTO_INCREMENT = 18');
-        $connection->exec('DELETE FROM transport WHERE id > 10');
-        $connection->exec('ALTER TABLE transport AUTO_INCREMENT = 11');
-        $connection->exec('DELETE FROM salary WHERE id > 48');
-        $connection->exec('ALTER TABLE salary AUTO_INCREMENT = 49');
-        $connection->exec('DELETE FROM race WHERE id > 44');
-        $connection->exec('ALTER TABLE race AUTO_INCREMENT = 45');
+        $connection->exec('DELETE FROM employee WHERE id > 0');
+        $connection->exec('ALTER TABLE employee AUTO_INCREMENT = 1');
+        $connection->exec('DELETE FROM transport WHERE id > 0');
+        $connection->exec('ALTER TABLE transport AUTO_INCREMENT = 1');
+        $connection->exec('DELETE FROM salary WHERE id > 0');
+        $connection->exec('ALTER TABLE salary AUTO_INCREMENT = 1');
+        $connection->exec('DELETE FROM race WHERE id > 0');
+        $connection->exec('ALTER TABLE race AUTO_INCREMENT = 1');
         $connection->exec('DELETE FROM position WHERE id > 12');
         $connection->exec('ALTER TABLE position AUTO_INCREMENT = 13');
         $connection->exec('DELETE FROM route WHERE id > 14');
         $connection->exec('ALTER TABLE route AUTO_INCREMENT = 15');
+    }
 
+    /**
+     * @param string $firstName
+     * @param string $lastName
+     * @param int $timestamp
+     * @return string
+     * @throws Exception
+     */
+    private function getRandomEmail(string $firstName, string $lastName, int $timestamp): string
+    {
+        $transRules = 'Any-Latin; Latin-ASCII; Lower(); [:Punctuation:] Remove;';
+        $transliterator = Transliterator::create($transRules);
+        $domain = $this->getFaker()->safeEmailDomain;
+        $yearFormat = ['Y', 'y'];
+        $isLastName = random_int(0, 1);
+
+        return $transliterator->transliterate($firstName)
+        . ($isLastName ? '-' . $transliterator->transliterate($lastName) : '')
+        . date($yearFormat[array_rand($yearFormat)], $timestamp)
+        . '@'
+        . $domain;
     }
 
     /**
@@ -106,8 +127,6 @@ class Fixtures
         $start = microtime(true);
 
         $firstName = $lastName = $dob = $gender = $email = $license = $positionId = $monthlySalary = $hired = '';
-        $transRules = 'Any-Latin; Latin-ASCII; Lower(); [:Punctuation:] Remove;';
-        $transliterator = Transliterator::create($transRules);
         $minAgeTimestamp = $currentTimestamp - (31556952 * self::MIN_YEARS);
         $maxAgeTimestamp = $currentTimestamp - (31556952 * self::MAX_YEARS);
         $minHiredTimestamp = $currentTimestamp - (31556952 * self::MIN_HIRED);
@@ -115,7 +134,7 @@ class Fixtures
         $statement = $connection->prepare(<<<SQL
     INSERT INTO employee (firstname, lastname, dob, gender, email, license, position_id, monthly_salary, hired)
     VALUES (:firstName, :lastName, :dob, :gender, :email, :license, :positionId, :monthlySalary, :hired)
-    ON DUPLICATE KEY UPDATE dob=VALUES(dob), position_id=VALUES(position_id);
+    ON DUPLICATE KEY UPDATE dob=VALUES(dob), position_id=VALUES(position_id), email=VALUES(email);
 SQL
         );
         $statement->bindParam(':firstName', $firstName);
@@ -128,17 +147,13 @@ SQL
         $statement->bindParam(':monthlySalary', $monthlySalary);
         $statement->bindParam(':hired', $hired);
 
-        for ($employeeId = 17; $employeeId < $employeeCount; $employeeId++) {
+        for ($employeeId = 0; $employeeId < $employeeCount; $employeeId++) {
             $gender = random_int(1, 2);
             $firstName = $this->getRandomName($gender);
             $lastName = $this->getRandomLastName();
             $timestamp = random_int($maxAgeTimestamp, $minAgeTimestamp);
             $dob = date('Y-m-d', $timestamp);
-            $email = $transliterator->transliterate($firstName)
-                . '-'
-                . $transliterator->transliterate($lastName)
-                . date('Y', $timestamp)
-                . '@example.com';
+            $email = $this->getRandomEmail($firstName, $lastName, $timestamp);
             $license = random_int(0, 1);
             $positionId = random_int(1, 12);
             $monthlySalary = random_int(10000, 50000);
@@ -155,8 +170,30 @@ SQL
      */
     private function getRandomTransportModel(): string
     {
-        $modelFirstName = ['LiAZ-', 'AKSM-', 'ElectroLAZ-', 'Bogdan ', 'Solaris ', 'Irisbus ', 'TrolZa-', 'BTZ-', 'VMZ-', 'PKTS-'];
-        $modelLastName = ['5280', '321', '12', 'Т701.10', 'Trollino 15', 'Cristalis', '5265', '52763', '62151', '6281'];
+        $modelFirstName = [
+            'LiAZ-',
+            'AKSM-',
+            'ElectroLAZ-',
+            'Bogdan ',
+            'Solaris ',
+            'Irisbus ',
+            'TrolZa-',
+            'BTZ-',
+            'VMZ-',
+            'PKTS-'
+        ];
+        $modelLastName = [
+            '5280',
+            '321',
+            '12',
+            'Т701.10',
+            'Trollino 15',
+            'Cristalis',
+            '5265',
+            '52763',
+            '62151',
+            '6281'
+        ];
 
         return $modelFirstName[array_rand($modelFirstName)]
             . $modelLastName[array_rand($modelLastName)];
@@ -191,12 +228,13 @@ SQL
         $statement = $connection->prepare(<<<SQL
     INSERT INTO transport (model, number)
     VALUES (:model, :number)
+    ON DUPLICATE KEY UPDATE number=VALUES(number)
 SQL
         );
         $statement->bindParam(':model', $transportModel);
         $statement->bindParam(':number', $transportNumber);
 
-        for ($transportId = 10; $transportId < $transportCount; $transportId++) {
+        for ($transportId = 0; $transportId < $transportCount; $transportId++) {
             $transportModel = $this->getRandomTransportModel();
             $transportNumber = $this->getRandomTransportNumber();
             $statement->execute();
@@ -244,6 +282,7 @@ SQL
     /**
      * @param int $timestampFrom
      * @param int $timestampTo
+     * @param string $format
      * @return string
      * @throws Exception
      */
@@ -282,7 +321,7 @@ SQL
         $employeePositionStatement = $connection->query('SELECT id, position_id FROM employee');
         $employeesPosition = $employeePositionStatement->fetchAll(PDO::FETCH_KEY_PAIR);
 
-        for ($salaryId = 48; $salaryId < $salaryCount; $salaryId++) {
+        for ($salaryId = 0; $salaryId < $salaryCount; $salaryId++) {
             $employeeId = $this->getRandomEmployeeId();
             $hiredTimestamp = strtotime($employeesHired[$employeeId]);
             $paidAt = $this->getRandomDate($hiredTimestamp, $currentTimestamp, 'Y-m-d H:i:s');
@@ -295,6 +334,7 @@ SQL
     }
 
     /**
+     * @param int $racesCount
      * @throws Exception
      */
     private function generateRaces(int $racesCount): void
@@ -320,7 +360,7 @@ SQL
         $employeeHiredStatement = $connection->query('SELECT id, hired FROM employee');
         $employeesHired = $employeeHiredStatement->fetchAll(PDO::FETCH_KEY_PAIR);
 
-        for ($raceId = 44; $raceId < $racesCount; $raceId++) {
+        for ($raceId = 0; $raceId < $racesCount; $raceId++) {
             $employeeId = $this->getRandomEmployeeId();
             $transportId = $this->getRandomTransportId();
             $routeId = $this->getRandomRouteId();
